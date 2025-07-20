@@ -2401,4 +2401,5 @@ def main() -> None:
 
 # تشغيل البوت الخاص بك (تأكد أن 'application' معرف مسبقًا في كود آخر)
 if __name__ == '__main__':
+    main()
     print("🚀 Starting Telegram bot...")
