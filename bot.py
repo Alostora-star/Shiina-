@@ -2375,7 +2375,7 @@ import threading
 import time
 import requests
 
-flask_app = Flask(name)  # ← إصلاح هنا
+flask_app = Flask(__name__)  # ← إصلاح هنا
 
 @flask_app.route("/")
 def home():
@@ -2397,7 +2397,7 @@ def keep_alive_ping():
 
 threading.Thread(target=keep_alive_ping, daemon=True).start()
 
-if name == 'main':  # ← إصلاح هنا
+if __name__ == '__main__':  # ← إصلاح هنا
     print("🚀 Starting Telegram bot...")
     application.run_polling()
     application.run_polling()
