@@ -4,6 +4,12 @@ from dotenv import load_dotenv
 import uuid
 from datetime import datetime
 import sqlite3
+from flask import Flask
+import threading
+import time
+import requests
+import os
+
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ConversationHandler, filters, ContextTypes, ApplicationBuilder
@@ -42,6 +48,32 @@ from database import (
 load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+flask_app = Flask(__name__)
+
+# المسار الرئيسي للتحقق من حالة الخدمة
+@flask_app.route("/")
+def home():
+    return "✅ Bot is running and alive!"
+
+# تشغيل Flask على المنفذ الذي تحدده Render
+def run_flask():
+    port = int(os.environ.get("PORT", 5000))  # ضروري استخدام المتغير البيئي PORT
+    flask_app.run(host="0.0.0.0", port=port)
+
+# بدء السيرفر في Thread منفصل
+threading.Thread(target=run_flask).start()
+
+# إرسال طلبات ping دورية للحفاظ على الخدمة نشطة
+def keep_alive_ping():
+    while True:
+        try:
+            requests.get("https://shiina-hvtp.onrender.com")  # غيّر الرابط حسب نطاق موقعك
+            print("✅ Sent keep-alive ping to Render")
+        except Exception as e:
+            print(f"⚠️ Ping failed: {e}")
+        time.sleep(300)  # كل 5 دقائق
+
+threading.Thread(target=keep_alive_ping, daemon=True).start()
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -2364,43 +2396,6 @@ def main() -> None:
     print(f"🤖 تم تشغيل بوت {WEBSITE_NAME} بنجاح! يتم تخزين البيانات بشكل دائم.")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
-if __name__ == '__main__':
-    main()
-
-
-from flask import Flask
-import threading
-import time
-import requests
-import os
-
-# إنشاء تطبيق Flask
-flask_app = Flask(__name__)
-
-# المسار الرئيسي للتحقق من حالة الخدمة
-@flask_app.route("/")
-def home():
-    return "✅ Bot is running and alive!"
-
-# تشغيل Flask على المنفذ الذي تحدده Render
-def run_flask():
-    port = int(os.environ.get("PORT", 5000))  # ضروري استخدام المتغير البيئي PORT
-    flask_app.run(host="0.0.0.0", port=port)
-
-# بدء السيرفر في Thread منفصل
-threading.Thread(target=run_flask).start()
-
-# إرسال طلبات ping دورية للحفاظ على الخدمة نشطة
-def keep_alive_ping():
-    while True:
-        try:
-            requests.get("https://shiina-hvtp.onrender.com")  # غيّر الرابط حسب نطاق موقعك
-            print("✅ Sent keep-alive ping to Render")
-        except Exception as e:
-            print(f"⚠️ Ping failed: {e}")
-        time.sleep(300)  # كل 5 دقائق
-
-threading.Thread(target=keep_alive_ping, daemon=True).start()
 
 # تشغيل البوت الخاص بك (تأكد أن 'application' معرف مسبقًا في كود آخر)
 if __name__ == '__main__':
