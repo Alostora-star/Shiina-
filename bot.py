@@ -2391,6 +2391,8 @@ def main() -> None:
     application.add_handler(CommandHandler("admin_confirm_deposit", admin_confirm_deposit))
     application.add_handler(CommandHandler("admin_confirm_shipped", admin_confirm_shipped))
     application.add_handler(CommandHandler("stats", stats))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     # الأمر /broadcast تم إضافته بالفعل كجزء من entry_points في ConversationHandler
 
     print(f"🤖 تم تشغيل بوت {WEBSITE_NAME} بنجاح! يتم تخزين البيانات بشكل دائم.")
