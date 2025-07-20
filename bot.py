@@ -2368,36 +2368,41 @@ if __name__ == '__main__':
     main()
 
 
-# --- إبقاء البوت نشطاً على Render ---
-
 from flask import Flask
 import threading
 import time
 import requests
+import os
 
-flask_app = Flask(__name__)  # ← إصلاح هنا
+# إنشاء تطبيق Flask
+flask_app = Flask(__name__)
 
+# المسار الرئيسي للتحقق من حالة الخدمة
 @flask_app.route("/")
 def home():
-    return "✅ Bot is running and alive!"  # ← إصلاح الترميز
+    return "✅ Bot is running and alive!"
 
+# تشغيل Flask على المنفذ الذي تحدده Render
 def run_flask():
-    flask_app.run(host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 5000))  # ضروري استخدام المتغير البيئي PORT
+    flask_app.run(host="0.0.0.0", port=port)
 
+# بدء السيرفر في Thread منفصل
 threading.Thread(target=run_flask).start()
 
+# إرسال طلبات ping دورية للحفاظ على الخدمة نشطة
 def keep_alive_ping():
     while True:
         try:
-            requests.get("https://shiina-hvtp.onrender.com")
+            requests.get("https://shiina-hvtp.onrender.com")  # غيّر الرابط حسب نطاق موقعك
             print("✅ Sent keep-alive ping to Render")
         except Exception as e:
             print(f"⚠️ Ping failed: {e}")
-        time.sleep(300)
+        time.sleep(300)  # كل 5 دقائق
 
 threading.Thread(target=keep_alive_ping, daemon=True).start()
 
-if __name__ == '__main__':  # ← إصلاح هنا
+# تشغيل البوت الخاص بك (تأكد أن 'application' معرف مسبقًا في كود آخر)
+if __name__ == '__main__':
     print("🚀 Starting Telegram bot...")
-    application.run_polling()
     application.run_polling()
