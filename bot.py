@@ -2370,39 +2370,16 @@ if __name__ == '__main__':
 
 # --- إبقاء البوت نشطاً على Render ---
 
-import logging
+from flask import Flask
 import threading
 import time
 import requests
-from flask import Flask
-from telegram.ext import ApplicationBuilder
 
-# --- Telegram Bot Token ---
-import os
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-
-# --- Telegram Logging ---
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-logger = logging.getLogger(name)
-
-# --- Telegram Bot Setup ---
-application = ApplicationBuilder().token(BOT_TOKEN).build()
-
-# ط¶ط¹ ظ‡ظ†ط§ ط§ظ„ظ‡ط§ظ†ط¯ظ„ط±ط² ط§ظ„ط®ط§طµط© ط¨ظƒطŒ ظƒظ…ط«ط§ظ„:
-# from telegram.ext import CommandHandler
-# async def start(update, context): await update.message.reply_text("Hello!")
-# application.add_handler(CommandHandler("start", start))
-
-# --- ط¥ط¨ظ‚ط§ط، ط§ظ„ط¨ظˆطھ ظ†ط´ط·ط§ظ‹ ط¹ظ„ظ‰ Render ---
-
-flask_app = Flask(name)
+flask_app = Flask(name)  # ← إصلاح هنا
 
 @flask_app.route("/")
 def home():
-    return "âœ… Bot is running and alive!"
+    return "✅ Bot is running and alive!"  # ← إصلاح الترميز
 
 def run_flask():
     flask_app.run(host="0.0.0.0", port=8000)
@@ -2413,14 +2390,14 @@ def keep_alive_ping():
     while True:
         try:
             requests.get("https://shiina-hvtp.onrender.com")
-            print("âœ… Sent keep-alive ping to Render")
+            print("✅ Sent keep-alive ping to Render")
         except Exception as e:
-            print(f"âڑ ï¸ڈ Ping failed: {e}")
+            print(f"⚠️ Ping failed: {e}")
         time.sleep(300)
 
 threading.Thread(target=keep_alive_ping, daemon=True).start()
 
-# --- Start polling ---
-if name == 'main':
-    print("ًںڑ€ Starting Telegram bot...")
+if name == 'main':  # ← إصلاح هنا
+    print("🚀 Starting Telegram bot...")
+    application.run_polling()
     application.run_polling()
